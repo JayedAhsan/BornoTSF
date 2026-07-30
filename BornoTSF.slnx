@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="BornoTSF.vcxproj" Id="7e287c91-9128-4f1a-b47a-3d28e73b9011" />
+</Solution>

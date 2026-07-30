@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BornoTSF.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="core\BornoTSF.h" />
+    <ClInclude Include="core\BornoTSFBaseStructure.h" />
+    <ClInclude Include="core\BornoTSFStructureArray.h" />
+    <ClInclude Include="infra\Compartment.h" />
+    <ClInclude Include="composition\CompositionProcessorEngine.h" />
+    <ClInclude Include="core\Define.h" />
+    <ClInclude Include="display\DisplayAttributeInfo.h" />
+    <ClInclude Include="composition\EditSession.h" />
+    <ClInclude Include="display\EnumDisplayAttributeInfo.h" />
+    <ClInclude Include="core\Globals.h" />
+    <ClInclude Include="composition\KeyHandlerEditSession.h" />
+    <ClInclude Include="composition\KeyStateCategory.h" />
+    <ClInclude Include="infra\LanguageBar.h" />
+    <ClInclude Include="core\Private.h" />
+    <ClInclude Include="storage\RegKey.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="core\Settings.h" />
+    <ClInclude Include="core\stdafx.h" />
+    <ClInclude Include="infra\TfInputProcessorProfile.h" />
+    <ClInclude Include="layoutParsers\Transliterators\AutoCorrectMap.hpp" />
+    <ClInclude Include="layoutParsers\Transliterators\AvroPhonetic.hpp" />
+    <ClInclude Include="layoutParsers\Transliterators\BornoPhonetic.hpp" />
+    <ClInclude Include="layoutParsers\Transliterators\Khipro.h" />
+    <ClInclude Include="layoutParsers\Layouts\National.h" />
+    <ClInclude Include="layoutParsers\Layouts\Probhat.h" />
+    <ClInclude Include="layoutParsers\khipro-port\mim_engine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="infra\ActiveLanguageProfileNotifySink.cpp" />
+    <ClCompile Include="core\BornoTSF.cpp" />
+    <ClCompile Include="core\BornoTSFBaseStructure.cpp" />
+    <ClCompile Include="infra\Compartment.cpp" />
+    <ClCompile Include="composition\Composition.cpp" />
+    <ClCompile Include="composition\CompositionProcessorEngine.cpp" />
+    <ClCompile Include="display\DisplayAttribute.cpp" />
+    <ClCompile Include="display\DisplayAttributeInfo.cpp" />
+    <ClCompile Include="display\DisplayAttributeProvider.cpp" />
+    <ClCompile Include="DllMain.cpp" />
+    <ClCompile Include="composition\EditSession.cpp" />
+    <ClCompile Include="composition\EndComposition.cpp" />
+    <ClCompile Include="display\EnumDisplayAttributeInfo.cpp" />
+    <ClCompile Include="infra\FunctionProviderSink.cpp" />
+    <ClCompile Include="core\Globals.cpp" />
+    <ClCompile Include="composition\KeyEventSink.cpp" />
+    <ClCompile Include="composition\KeyHandler.cpp" />
+    <ClCompile Include="composition\KeyHandlerEditSession.cpp" />
+    <ClCompile Include="composition\KeyStateCategory.cpp" />
+    <ClCompile Include="infra\LanguageBar.cpp" />
+    <ClCompile Include="Register.cpp" />
+    <ClCompile Include="storage\RegKey.cpp" />
+    <ClCompile Include="infra\Server.cpp" />
+    <ClCompile Include="composition\StartComposition.cpp" />
+    <ClCompile Include="infra\TextEditSink.cpp" />
+    <ClCompile Include="infra\TfInputProcessorProfile.cpp" />
+    <ClCompile Include="infra\ThreadFocusSink.cpp" />
+    <ClCompile Include="infra\ThreadMgrEventSink.cpp" />
+    <ClCompile Include="layoutParsers\Transliterators\Khipro.cpp" />
+    <ClCompile Include="layoutParsers\Layouts\National.cpp" />
+    <ClCompile Include="layoutParsers\Layouts\Probhat.cpp" />
+    <ClCompile Include="layoutParsers\khipro-port\mim_engine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BornoTSF.rc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7E287C91-9128-4F1A-B47A-3D28E73B9011}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>BornoTSF</RootNamespace>
+    <ProjectName>BornoTSF</ProjectName>
+    <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''">$(VCTargetsPath11)</VCTargetsPath>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)</TargetName>
+    <IntDir>$(SolutionDir)$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)</TargetName>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BornoTSF_EXPORTS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)core;$(ProjectDir)composition;$(ProjectDir)display;$(ProjectDir)infra;$(ProjectDir)storage;$(ProjectDir)layoutParsers;$(ProjectDir)layoutParsers\Transliterators;$(ProjectDir)layoutParsers\Layouts;$(ProjectDir)layoutParsers\khipro-port;$(BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>BornoTSF.def</ModuleDefinitionFile>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BornoTSF_EXPORTS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)core;$(ProjectDir)composition;$(ProjectDir)display;$(ProjectDir)infra;$(ProjectDir)storage;$(ProjectDir)layoutParsers;$(ProjectDir)layoutParsers\Transliterators;$(ProjectDir)layoutParsers\Layouts;$(ProjectDir)layoutParsers\khipro-port;$(BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>BornoTSF.def</ModuleDefinitionFile>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BornoTSF_EXPORTS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)core;$(ProjectDir)composition;$(ProjectDir)display;$(ProjectDir)infra;$(ProjectDir)storage;$(ProjectDir)layoutParsers;$(ProjectDir)layoutParsers\Transliterators;$(ProjectDir)layoutParsers\Layouts;$(ProjectDir)layoutParsers\khipro-port;$(BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BrowseInformation>false</BrowseInformation>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>BornoTSF.def</ModuleDefinitionFile>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;BornoTSF_EXPORTS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)core;$(ProjectDir)composition;$(ProjectDir)display;$(ProjectDir)infra;$(ProjectDir)storage;$(ProjectDir)layoutParsers;$(ProjectDir)layoutParsers\Transliterators;$(ProjectDir)layoutParsers\Layouts;$(ProjectDir)layoutParsers\khipro-port;$(BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BrowseInformation>false</BrowseInformation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>BornoTSF.def</ModuleDefinitionFile>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

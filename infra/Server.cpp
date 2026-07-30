@@ -1,0 +1,188 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include "Private.h"
+#include "Globals.h"
+#include "BornoTSF.h"
+
+BOOL RegisterProfiles();
+void UnregisterProfiles();
+BOOL RegisterCategories();
+void UnregisterCategories();
+BOOL RegisterServer();
+void UnregisterServer();
+
+void FreeGlobalObjects(void);
+
+class CClassFactory;
+static CClassFactory* classFactoryObjects[1] = { nullptr };
+
+void DllAddRef(void)
+{
+    InterlockedIncrement(&Global::dllRefCount);
+}
+
+void DllRelease(void)
+{
+    if (InterlockedDecrement(&Global::dllRefCount) < 0)
+    {
+        EnterCriticalSection(&Global::CS);
+
+        if (nullptr != classFactoryObjects[0])
+        {
+            FreeGlobalObjects();
+        }
+        assert(Global::dllRefCount == -1);
+
+        LeaveCriticalSection(&Global::CS);
+    }
+}
+
+class CClassFactory : public IClassFactory
+{
+public:
+    STDMETHODIMP QueryInterface(REFIID riid, _Outptr_ void **ppvObj);
+    STDMETHODIMP_(ULONG) AddRef(void);
+    STDMETHODIMP_(ULONG) Release(void);
+
+    STDMETHODIMP CreateInstance(_In_opt_ IUnknown *pUnkOuter, _In_ REFIID riid, _COM_Outptr_ void **ppvObj);
+    STDMETHODIMP LockServer(BOOL fLock);
+
+    CClassFactory(REFCLSID rclsid, HRESULT (*pfnCreateInstance)(IUnknown *pUnkOuter, REFIID riid, void **ppvObj))
+        : _rclsid(rclsid)
+    {
+        _pfnCreateInstance = pfnCreateInstance;
+    }
+
+public:
+    REFCLSID _rclsid;
+    HRESULT (*_pfnCreateInstance)(IUnknown *pUnkOuter, REFIID riid, _COM_Outptr_ void **ppvObj);
+private:
+	CClassFactory& operator=(const CClassFactory& rhn) { rhn; return *this; };
+};
+
+STDAPI CClassFactory::QueryInterface(REFIID riid, _Outptr_ void **ppvObj)
+{
+    if (IsEqualIID(riid, IID_IClassFactory) || IsEqualIID(riid, IID_IUnknown))
+    {
+        *ppvObj = this;
+        DllAddRef();
+        return NOERROR;
+    }
+    *ppvObj = nullptr;
+
+    return E_NOINTERFACE;
+}
+
+STDAPI_(ULONG) CClassFactory::AddRef()
+{
+    DllAddRef();
+    return (Global::dllRefCount + 1);
+}
+
+STDAPI_(ULONG) CClassFactory::Release()
+{
+    DllRelease();
+    return (Global::dllRefCount + 1);
+}
+
+STDAPI CClassFactory::CreateInstance(_In_opt_ IUnknown *pUnkOuter, _In_ REFIID riid, _COM_Outptr_ void **ppvObj)
+{
+    return _pfnCreateInstance(pUnkOuter, riid, ppvObj);
+}
+
+STDAPI CClassFactory::LockServer(BOOL fLock)
+{
+    if (fLock)
+    {
+        DllAddRef();
+    }
+    else
+    {
+        DllRelease();
+    }
+
+    return S_OK;
+}
+
+void BuildGlobalObjects(void)
+{
+    classFactoryObjects[0] = new (std::nothrow) CClassFactory(Global::BornoTSFCLSID, BornoTSF::CreateInstance);
+}
+
+void FreeGlobalObjects(void)
+{
+    for (int i = 0; i < ARRAYSIZE(classFactoryObjects); i++)
+    {
+        if (nullptr != classFactoryObjects[i])
+        {
+            delete classFactoryObjects[i];
+            classFactoryObjects[i] = nullptr;
+        }
+    }
+}
+
+_Check_return_
+STDAPI DllGetClassObject(
+	_In_ REFCLSID rclsid, 
+	_In_ REFIID riid, 
+	_Outptr_ void** ppv)
+{
+    if (classFactoryObjects[0] == nullptr)
+    {
+        EnterCriticalSection(&Global::CS);
+
+        if (classFactoryObjects[0] == nullptr)
+        {
+            BuildGlobalObjects();
+        }
+
+        LeaveCriticalSection(&Global::CS);
+    }
+
+    if (IsEqualIID(riid, IID_IClassFactory) ||
+        IsEqualIID(riid, IID_IUnknown))
+    {
+        for (int i = 0; i < ARRAYSIZE(classFactoryObjects); i++)
+        {
+            if (nullptr != classFactoryObjects[i] &&
+                IsEqualGUID(rclsid, classFactoryObjects[i]->_rclsid))
+            {
+                *ppv = (void *)classFactoryObjects[i];
+                DllAddRef();
+                return NOERROR;
+            }
+        }
+    }
+
+    *ppv = nullptr;
+    return CLASS_E_CLASSNOTAVAILABLE;
+}
+
+STDAPI DllCanUnloadNow(void)
+{
+    if (Global::dllRefCount >= 0)
+    {
+        return S_FALSE;
+    }
+
+    return S_OK;
+}
+
+STDAPI DllUnregisterServer(void)
+{
+    UnregisterProfiles();
+    UnregisterCategories();
+    UnregisterServer();
+
+    return S_OK;
+}
+
+STDAPI DllRegisterServer(void)
+{
+    if ((!RegisterServer()) || (!RegisterProfiles()) || (!RegisterCategories()))
+    {
+        DllUnregisterServer();
+        return E_FAIL;
+    }
+    return S_OK;
+}
