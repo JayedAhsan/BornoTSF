@@ -43,7 +43,7 @@
 ## Installation & Usage
 
 ### Setup via Installer
-1. Download the latest `BornoTSF_Setup_*.exe` from the [Releases](https://github.com/codepotro/BornoTSF/releases) section.
+1. Download the latest `BornoTSF_Setup_*.exe` from the [Releases](https://github.com/JayedAhsan/BornoTSF/releases) section.
 2. Run the installer and select your preferred keyboard layouts (e.g., Borno Phonetic, Avro Phonetic, National, etc.).
 3. Accept the License Agreement and complete setup.
 4. Press **`Win + Space`** or click the Language Bar on your Windows Taskbar to switch to your desired BornoTSF layout and start typing!
