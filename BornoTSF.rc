@@ -31,8 +31,8 @@ IDI_ICON_PROBHAT_LIGHT  ICON                    "assets\\image\\probhat.ico"
 //
 
 IDR_VERSION2 VERSIONINFO
- FILEVERSION 2026,7,30,0
- PRODUCTVERSION 2026,7,30,0
+ FILEVERSION 2026,8,3,0
+ PRODUCTVERSION 2026,8,3,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -49,12 +49,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Codepotro"
             VALUE "FileDescription", "BornoTSF - Open Source IME for Windows OS"
-            VALUE "FileVersion", "2026.7.30.0"
+            VALUE "FileVersion", "2026.8.3.0"
             VALUE "InternalName", "BornoTSF.dll"
             VALUE "LegalCopyright", "Copyright (C) Codepotro. All Rights Reserved"
             VALUE "OriginalFilename", "BornoTSF.dll"
             VALUE "ProductName", "BornoTSF Keyboard"
-            VALUE "ProductVersion", "2026.7.30.0"
+            VALUE "ProductVersion", "2026.8.3.0"
         END
     END
     BLOCK "VarFileInfo"
