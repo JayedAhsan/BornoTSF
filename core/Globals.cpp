@@ -166,6 +166,8 @@ USHORT ModifiersValue = 0;
 BOOL   IsShiftKeyDownOnly = FALSE;
 BOOL   IsControlKeyDownOnly = FALSE;
 BOOL   IsAltKeyDownOnly = FALSE;
+UINT   CandidateCommitKey = 0;
+BOOL   isImeEnabled = TRUE;
 
 BOOL UpdateModifiers(WPARAM wParam, LPARAM lParam)
 {

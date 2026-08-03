@@ -59,17 +59,16 @@ inline BOOL GetPhoneticCorrection() { return Global::phoneticCorrection; }
 inline DWORD GetTypingStyle() { return Global::typingStyle; }
 inline DWORD GetCurrentLayout() { return Global::currentLayout; }
 
-
-
-
-
 inline void SetPhoneticCorrection(BOOL enable) {
   Global::phoneticCorrection = enable;
 }
-
 inline void SetTypingStyle(DWORD style) {
   Global::typingStyle = style;
 }
+
+
+
+
 
 inline void SetCurrentLayout(DWORD layout) {
   Global::currentLayout = layout;

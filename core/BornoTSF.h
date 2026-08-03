@@ -101,6 +101,7 @@ public:
     HRESULT _HandleCompositionInput(TfEditCookie ec, _In_ ITfContext *pContext, WCHAR wch);
     HRESULT _HandleCompositionFinalize(TfEditCookie ec, _In_ ITfContext *pContext, BOOL fCandidateList);
     HRESULT _HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pContext);
+    HRESULT _HandleCandidateSelect(TfEditCookie ec, _In_ ITfContext *pContext, UINT code);
     HRESULT _HandleCompositionBackspace(TfEditCookie ec, _In_ ITfContext *pContext);
     HRESULT _HandleCompositionArrowKey(TfEditCookie ec, _In_ ITfContext *pContext, KEYSTROKE_FUNCTION keyFunction);
     HRESULT _HandleCompositionPunctuation(TfEditCookie ec, _In_ ITfContext *pContext, WCHAR wch);

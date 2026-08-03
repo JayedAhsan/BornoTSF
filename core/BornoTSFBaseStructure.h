@@ -35,7 +35,10 @@ enum KEYSTROKE_FUNCTION
     FUNCTION_DOUBLE_SINGLE_BYTE,
 
     // Function Punctuation
-    FUNCTION_PUNCTUATION
+    FUNCTION_PUNCTUATION,
+
+    // Function Candidate Selection
+    FUNCTION_CANDIDATE_SELECT
 };
 
 //---------------------------------------------------------------------

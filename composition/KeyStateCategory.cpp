@@ -74,6 +74,9 @@ HRESULT CKeyStateCategory::KeyStateHandler(KEYSTROKE_FUNCTION function, KeyHandl
     case FUNCTION_CONVERT:
         return HandleKeyConvert(dto);
 
+    case FUNCTION_CANDIDATE_SELECT:
+        return HandleKeyCandidateSelect(dto);
+
     case FUNCTION_CANCEL:
         return HandleKeyCancel(dto);
 
@@ -117,6 +120,12 @@ HRESULT CKeyStateCategory::HandleKeyFinalizeTextStoreAndInput(KeyHandlerEditSess
 }
 
 HRESULT CKeyStateCategory::HandleKeyConvert(KeyHandlerEditSessionDTO dto)
+{
+    dto;
+    return E_NOTIMPL;
+}
+
+HRESULT CKeyStateCategory::HandleKeyCandidateSelect(KeyHandlerEditSessionDTO dto)
 {
     dto;
     return E_NOTIMPL;
@@ -175,6 +184,11 @@ HRESULT CKeyStateComposing::HandleKeyFinalizeTextStore(KeyHandlerEditSessionDTO 
 HRESULT CKeyStateComposing::HandleKeyConvert(KeyHandlerEditSessionDTO dto)
 {
     return _pTextService->_HandleCompositionConvert(dto.ec, dto.pContext);
+}
+
+HRESULT CKeyStateComposing::HandleKeyCandidateSelect(KeyHandlerEditSessionDTO dto)
+{
+    return _pTextService->_HandleCandidateSelect(dto.ec, dto.pContext, dto.code);
 }
 
 HRESULT CKeyStateComposing::HandleKeyCancel(KeyHandlerEditSessionDTO dto)

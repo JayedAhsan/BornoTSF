@@ -8,6 +8,7 @@
 #include "KeyHandlerEditSession.h"
 #include "Compartment.h"
 #include "CompositionProcessorEngine.h"
+#include "../display/CandidateWindow.h"
 
 #define THIRDPARTY_NEXTPAGE  static_cast<WORD>(0xF003)
 #define THIRDPARTY_PREVPAGE  static_cast<WORD>(0xF004)
@@ -48,9 +49,7 @@ __inline UINT VKeyFromVKPacketAndWchar(UINT vk, WCHAR wch)
 BOOL BornoTSF::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT *pCodeOut, _Out_writes_(1) WCHAR *pwch, _Out_opt_ _KEYSTROKE_STATE *pKeyState)
 {
     pContext;
-    BOOL isOpen = FALSE;
-    CCompartment CompartmentKeyboardOpen(_pThreadMgr, _tfClientId, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE);
-    CompartmentKeyboardOpen._GetCompartmentBOOL(isOpen);
+    BOOL isOpen = Global::isImeEnabled;
 
     if (pKeyState)
     {
@@ -67,22 +66,19 @@ BOOL BornoTSF::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT *p
         return FALSE;
     }
 
-    BOOL isTouchKeyboardSpecialKeys = FALSE;
-    WCHAR wch = ConvertVKey(codeIn);
-    *pCodeOut = VKeyFromVKPacketAndWchar(codeIn, wch);
-    if ((wch == THIRDPARTY_NEXTPAGE) || (wch == THIRDPARTY_PREVPAGE))
+    // Ctrl fix
+    if ((GetKeyState(VK_CONTROL) & 0x8000) || (GetKeyState(VK_LCONTROL) & 0x8000) || (GetKeyState(VK_RCONTROL) & 0x8000))
     {
-        isTouchKeyboardSpecialKeys = TRUE;
-        if (pwch)
-        {
-            *pwch = wch;
-        }
+        return FALSE;
     }
 
     if (!isOpen)
     {
-        return isTouchKeyboardSpecialKeys;
+        return FALSE;
     }
+
+    WCHAR wch = ConvertVKey(codeIn);
+    *pCodeOut = VKeyFromVKPacketAndWchar(codeIn, wch);
 
     if (pwch)
     {
@@ -109,7 +105,7 @@ BOOL BornoTSF::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT *p
         return TRUE;
     }
 
-    return isTouchKeyboardSpecialKeys;
+    return FALSE;
 }
 
 WCHAR BornoTSF::ConvertVKey(UINT code)
@@ -140,32 +136,21 @@ BOOL BornoTSF::_IsKeyboardDisabled()
     ITfContext* pContext = nullptr;
     BOOL isDisabled = FALSE;
 
-    if ((_pThreadMgr->GetFocus(&pDocMgrFocus) != S_OK) ||
-        (pDocMgrFocus == nullptr))
-    {
-        isDisabled = TRUE;
-    }
-    else if ((pDocMgrFocus->GetTop(&pContext) != S_OK) ||
-        (pContext == nullptr))
-    {
-        isDisabled = TRUE;
-    }
-    else
+    if (_pThreadMgr != nullptr && SUCCEEDED(_pThreadMgr->GetFocus(&pDocMgrFocus)) && pDocMgrFocus != nullptr)
     {
         CCompartment CompartmentKeyboardDisabled(_pThreadMgr, _tfClientId, GUID_COMPARTMENT_KEYBOARD_DISABLED);
         CompartmentKeyboardDisabled._GetCompartmentBOOL(isDisabled);
 
-        CCompartment CompartmentEmptyContext(_pThreadMgr, _tfClientId, GUID_COMPARTMENT_EMPTYCONTEXT);
-        CompartmentEmptyContext._GetCompartmentBOOL(isDisabled);
-    }
+        if (!isDisabled)
+        {
+            CCompartment CompartmentEmptyContext(_pThreadMgr, _tfClientId, GUID_COMPARTMENT_EMPTYCONTEXT);
+            CompartmentEmptyContext._GetCompartmentBOOL(isDisabled);
+        }
 
-    if (pContext)
-    {
-        pContext->Release();
-    }
-
-    if (pDocMgrFocus)
-    {
+        if (SUCCEEDED(pDocMgrFocus->GetTop(&pContext)) && pContext != nullptr)
+        {
+            pContext->Release();
+        }
         pDocMgrFocus->Release();
     }
 
@@ -181,6 +166,16 @@ STDAPI BornoTSF::OnSetFocus(BOOL fForeground)
 STDAPI BornoTSF::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten)
 {
     Global::UpdateModifiers(wParam, lParam);
+
+    if (CCandidateWindow::GetInstance().IsVisible())
+    {
+        if (wParam == VK_UP || wParam == VK_DOWN
+            || wParam == VK_TAB || wParam == VK_SPACE || wParam == VK_RETURN)
+        {
+            *pIsEaten = TRUE;
+            return S_OK;
+        }
+    }
 
     _KEYSTROKE_STATE KeystrokeState;
     WCHAR wch = '\0';
@@ -199,6 +194,35 @@ STDAPI BornoTSF::OnTestKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lPara
 STDAPI BornoTSF::OnKeyDown(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten)
 {
     Global::UpdateModifiers(wParam, lParam);
+
+    if (CCandidateWindow::GetInstance().IsVisible())
+    {
+        if (wParam == VK_SPACE || wParam == VK_RETURN)
+        {
+            // commit highlighted candidate, forward triggering key
+            int selIdx = CCandidateWindow::GetInstance().GetSelectedIndex();
+            UINT selectCode = (UINT)('1' + selIdx);
+            Global::CandidateCommitKey = (UINT)wParam; // remember to forward after commit
+            _KEYSTROKE_STATE KeystrokeState;
+            KeystrokeState.Category = CATEGORY_COMPOSING;
+            KeystrokeState.Function = FUNCTION_CANDIDATE_SELECT;
+            _InvokeKeyHandler(pContext, selectCode, '\0', (DWORD)lParam, KeystrokeState);
+            *pIsEaten = TRUE;
+            return S_OK;
+        }
+        else if (wParam == VK_UP)
+        {
+            CCandidateWindow::GetInstance().SelectPrev();
+            *pIsEaten = TRUE;
+            return S_OK;
+        }
+        else if (wParam == VK_DOWN || wParam == VK_TAB)
+        {
+            CCandidateWindow::GetInstance().SelectNext();
+            *pIsEaten = TRUE;
+            return S_OK;
+        }
+    }
 
     _KEYSTROKE_STATE KeystrokeState;
     WCHAR wch = '\0';
@@ -239,26 +263,15 @@ STDAPI BornoTSF::OnTestKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam,
     {
         return E_INVALIDARG;
     }
-
     Global::UpdateModifiers(wParam, lParam);
-
-    WCHAR wch = '\0';
-    UINT code = 0;
-
-    *pIsEaten = _IsKeyEaten(pContext, (UINT)wParam, &code, &wch, NULL);
-
+    *pIsEaten = FALSE;
     return S_OK;
 }
 
 STDAPI BornoTSF::OnKeyUp(ITfContext *pContext, WPARAM wParam, LPARAM lParam, BOOL *pIsEaten)
 {
     Global::UpdateModifiers(wParam, lParam);
-
-    WCHAR wch = '\0';
-    UINT code = 0;
-
-    *pIsEaten = _IsKeyEaten(pContext, (UINT)wParam, &code, &wch, NULL);
-
+    *pIsEaten = FALSE;
     return S_OK;
 }
 
@@ -266,12 +279,18 @@ STDAPI BornoTSF::OnPreservedKey(ITfContext *pContext, REFGUID rguid, BOOL *pIsEa
 {
     pContext;
 
-    CCompositionProcessorEngine *pCompositionProcessorEngine = _pCompositionProcessorEngine;
-    if (pCompositionProcessorEngine)
+    if (IsEqualGUID(rguid, Global::BornoTSFGuidImeModePreserveKey))
     {
-        pCompositionProcessorEngine->OnPreservedKey(rguid, pIsEaten, _GetThreadMgr(), _GetClientId());
+        CCompartment CompartmentKeyboardOpen(_pThreadMgr, _tfClientId, GUID_COMPARTMENT_KEYBOARD_OPENCLOSE);
+        BOOL isOpen = FALSE;
+        CompartmentKeyboardOpen._GetCompartmentBOOL(isOpen);
+        CompartmentKeyboardOpen._SetCompartmentBOOL(!isOpen);
+        Global::isImeEnabled = !isOpen;
+        *pIsEaten = TRUE;
+        return S_OK;
     }
 
+    *pIsEaten = FALSE;
     return S_OK;
 }
 

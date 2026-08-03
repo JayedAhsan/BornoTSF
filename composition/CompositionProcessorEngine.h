@@ -46,6 +46,7 @@ public:
     const WCHAR* GetVirtualKeys() { return _keystrokeBuffer.Get(); } 
 
     std::wstring ApplyAllRules(const std::wstring &input);
+    std::wstring ApplyRulesWithoutAutoCorrect(const std::wstring &input);
     std::wstring StringToWstring(const std::string &str, UINT codePage);
     std::wstring WstringToString(const WCHAR *ptr, size_t len);
     std::string WstringToString(const std::wstring &wstr, UINT codePage);
@@ -108,7 +109,7 @@ private:
             Function = FUNCTION_NONE;
         }
     };
-    _KEYSTROKE _keystrokeTable[100];
+    _KEYSTROKE _keystrokeTable[150]; //increased for handling num keys
 
     CStringRange _keystrokeBuffer;
 

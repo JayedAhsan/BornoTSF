@@ -9,6 +9,7 @@
 #include <sstream>
 #include <tchar.h>
 #include "CompositionProcessorEngine.h"
+#include "../display/CandidateWindow.h"
 
 /* static */
 HRESULT BornoTSF::CreateInstance(_In_ IUnknown *pUnkOuter, REFIID riid, _Outptr_ void **ppvObj)
@@ -225,6 +226,8 @@ STDAPI BornoTSF::ActivateEx(ITfThreadMgr *pThreadMgr, TfClientId tfClientId, DWO
         goto ExitError;
     }
 
+    CCandidateWindow::GetInstance().Create();
+
     return S_OK;
 
 ExitError:
@@ -234,6 +237,8 @@ ExitError:
 
 STDAPI BornoTSF::Deactivate()
 {
+    CCandidateWindow::GetInstance().Destroy();
+
     if (_pCompositionProcessorEngine)
     {
         delete _pCompositionProcessorEngine;

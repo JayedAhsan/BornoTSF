@@ -56,6 +56,7 @@ protected:
     virtual HRESULT HandleKeyFinalizeTextStoreAndInput(KeyHandlerEditSessionDTO dto);
     virtual HRESULT HandleKeyFinalizeTextStore(KeyHandlerEditSessionDTO dto);
     virtual HRESULT HandleKeyConvert(KeyHandlerEditSessionDTO dto);
+    virtual HRESULT HandleKeyCandidateSelect(KeyHandlerEditSessionDTO dto);
     virtual HRESULT HandleKeyCancel(KeyHandlerEditSessionDTO dto);
     virtual HRESULT HandleKeyBackspace(KeyHandlerEditSessionDTO dto);
     virtual HRESULT HandleKeyArrow(KeyHandlerEditSessionDTO dto);
@@ -76,6 +77,7 @@ protected:
     HRESULT HandleKeyFinalizeTextStoreAndInput(KeyHandlerEditSessionDTO dto);
     HRESULT HandleKeyFinalizeTextStore(KeyHandlerEditSessionDTO dto);
     HRESULT HandleKeyConvert(KeyHandlerEditSessionDTO dto);
+    HRESULT HandleKeyCandidateSelect(KeyHandlerEditSessionDTO dto);
     HRESULT HandleKeyCancel(KeyHandlerEditSessionDTO dto);
     HRESULT HandleKeyBackspace(KeyHandlerEditSessionDTO dto);
     HRESULT HandleKeyArrow(KeyHandlerEditSessionDTO dto);
@@ -93,6 +95,7 @@ protected:
     HRESULT HandleKeyFinalizeTextStoreAndInput(KeyHandlerEditSessionDTO dto) { return CKeyStateCategory::HandleKeyFinalizeTextStoreAndInput(dto); };
     HRESULT HandleKeyFinalizeTextStore(KeyHandlerEditSessionDTO dto) { return CKeyStateCategory::HandleKeyFinalizeTextStore(dto); };
     HRESULT HandleKeyConvert(KeyHandlerEditSessionDTO dto) { return CKeyStateCategory::HandleKeyConvert(dto); };
+    HRESULT HandleKeyCandidateSelect(KeyHandlerEditSessionDTO dto) { return CKeyStateCategory::HandleKeyCandidateSelect(dto); };
     HRESULT HandleKeyCancel(KeyHandlerEditSessionDTO dto) { return CKeyStateCategory::HandleKeyCancel(dto); };
     HRESULT HandleKeyBackspace(KeyHandlerEditSessionDTO dto) { return CKeyStateCategory::HandleKeyBackspace(dto); };
     HRESULT HandleKeyArrow(KeyHandlerEditSessionDTO dto) { return CKeyStateCategory::HandleKeyArrow(dto); };

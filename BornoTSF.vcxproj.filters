@@ -98,6 +98,12 @@
     <ClInclude Include="layoutParsers\khipro-port\mim_engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="storage\DictionaryLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="display\CandidateWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="infra\ActiveLanguageProfileNotifySink.cpp">
@@ -164,6 +170,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="storage\RegKey.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\DictionaryLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="display\CandidateWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="infra\Server.cpp">

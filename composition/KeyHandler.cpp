@@ -1,10 +1,9 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
-
 #include "Private.h"
 #include "Globals.h"
 #include "EditSession.h"
 #include "BornoTSF.h"
 #include "CompositionProcessorEngine.h"
+#include "../display/CandidateWindow.h"
 
 BOOL BornoTSF::_IsRangeCovered(TfEditCookie ec, _In_ ITfRange *pRangeTest, _In_ ITfRange *pRangeCover)
 {
@@ -31,6 +30,7 @@ VOID BornoTSF::_DeleteCandidateList(BOOL isForce, _In_opt_ ITfContext *pContext)
     if (_pCompositionProcessorEngine) {
         _pCompositionProcessorEngine->PurgeVirtualKey();
     }
+    CCandidateWindow::GetInstance().ClearCandidates();
 }
 
 HRESULT BornoTSF::_HandleComplete(TfEditCookie ec, _In_ ITfContext *pContext)
@@ -93,13 +93,59 @@ HRESULT BornoTSF::_HandleCompositionInputWorker(_In_ CCompositionProcessorEngine
 
     pCompositionProcessorEngine->GetReadingStrings(&readingStrings);
 
+    std::vector<std::wstring> candidates;
     for (UINT index = 0; index < readingStrings.Count(); index++)
     {
+        CStringRange* pStrRange = readingStrings.GetAt(index);
+        if (pStrRange && pStrRange->Get() && pStrRange->GetLength() > 0)
+        {
+            candidates.push_back(std::wstring(pStrRange->Get(), pStrRange->GetLength()));
+        }
+
         hr = _AddComposingAndChar(ec, pContext, readingStrings.GetAt(index));
         if (FAILED(hr))
         {
             return hr;
         }
+    }
+
+    bool isPhonetic = (Global::currentLayout == BORNO_PHONETIC || Global::currentLayout == BORNO_AVRO);
+
+    if (pCompositionProcessorEngine->GetVirtualKeyLength() > 0 && isPhonetic)
+    {
+        std::wstring rawKeys(pCompositionProcessorEngine->GetVirtualKeys(), pCompositionProcessorEngine->GetVirtualKeyLength());
+
+        if (!candidates.empty())
+        {
+            // direct output
+            std::wstring normalParsed = pCompositionProcessorEngine->ApplyRulesWithoutAutoCorrect(rawKeys);
+
+            bool autoCorrectApplied = (!normalParsed.empty() && candidates[0] != normalParsed);
+
+            if (autoCorrectApplied)
+            {
+                // extended
+                if (!normalParsed.empty()) candidates.push_back(normalParsed);
+                if (!rawKeys.empty() && rawKeys != normalParsed && rawKeys != candidates[0])
+                    candidates.push_back(rawKeys);
+            }
+            else
+            {
+                // typed
+                if (!rawKeys.empty() && rawKeys != candidates[0])
+                    candidates.push_back(rawKeys);
+            }
+        }
+    }
+
+    if (!candidates.empty() && isPhonetic && candidates.size() > 1)
+    {
+        CCandidateWindow::GetInstance().SetCandidates(candidates);
+        CCandidateWindow::GetInstance().MoveToComposition(ec, pContext, _pComposition);
+    }
+    else
+    {
+        CCandidateWindow::GetInstance().ClearCandidates();
     }
 
     return hr;
@@ -138,6 +184,71 @@ HRESULT BornoTSF::_HandleCompositionFinalize(TfEditCookie ec, _In_ ITfContext *p
 HRESULT BornoTSF::_HandleCompositionConvert(TfEditCookie ec, _In_ ITfContext *pContext)
 {
     return _HandleCompositionFinalize(ec, pContext, FALSE);
+}
+
+HRESULT BornoTSF::_HandleCandidateSelect(TfEditCookie ec, _In_ ITfContext *pContext, UINT code)
+{
+    // index
+    int index = (int)(code - '1');
+    std::wstring selectedStr;
+
+    if (index >= 0 && index < (int)CCandidateWindow::GetInstance().GetCandidateCount())
+    {
+        selectedStr = CCandidateWindow::GetInstance().GetCandidate((size_t)index);
+    }
+
+    if (selectedStr.empty())
+    {
+        // as it is
+        _HandleComplete(ec, pContext);
+        return S_OK;
+    }
+
+    // selected
+    if (_pComposition != nullptr)
+    {
+        ITfRange* pCompRange = nullptr;
+        if (SUCCEEDED(_pComposition->GetRange(&pCompRange)) && pCompRange)
+        {
+            pCompRange->SetText(ec, 0, selectedStr.c_str(), (LONG)selectedStr.length());
+            // mov cursor to end
+            pCompRange->Collapse(ec, TF_ANCHOR_END);
+            TF_SELECTION sel;
+            sel.range = pCompRange;
+            sel.style.ase = TF_AE_NONE;
+            sel.style.fInterimChar = FALSE;
+            pContext->SetSelection(ec, 1, &sel);
+            pCompRange->Release();
+        }
+    }
+
+    // finish
+    if (_pCompositionProcessorEngine)
+    {
+        _pCompositionProcessorEngine->PurgeVirtualKey();
+    }
+
+    // clear
+    CCandidateWindow::GetInstance().ClearCandidates();
+    _TerminateComposition(ec, pContext);
+
+    // forward CandidateCommitKey
+    if (Global::CandidateCommitKey != 0)
+    {
+        UINT vk = Global::CandidateCommitKey;
+        Global::CandidateCommitKey = 0;
+
+        INPUT inputs[2] = {};
+        inputs[0].type = INPUT_KEYBOARD;
+        inputs[0].ki.wVk = (WORD)vk;
+        inputs[0].ki.dwFlags = 0;
+        inputs[1].type = INPUT_KEYBOARD;
+        inputs[1].ki.wVk = (WORD)vk;
+        inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
+        SendInput(2, inputs, sizeof(INPUT));
+    }
+
+    return S_OK;
 }
 
 HRESULT BornoTSF::_HandleCompositionBackspace(TfEditCookie ec, _In_ ITfContext *pContext)

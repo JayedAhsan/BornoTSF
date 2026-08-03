@@ -48,6 +48,8 @@
     <ClInclude Include="layoutParsers\Layouts\National.h" />
     <ClInclude Include="layoutParsers\Layouts\Probhat.h" />
     <ClInclude Include="layoutParsers\khipro-port\mim_engine.h" />
+    <ClInclude Include="storage\DictionaryLoader.h" />
+    <ClInclude Include="display\CandidateWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="infra\ActiveLanguageProfileNotifySink.cpp" />
@@ -72,6 +74,8 @@
     <ClCompile Include="infra\LanguageBar.cpp" />
     <ClCompile Include="Register.cpp" />
     <ClCompile Include="storage\RegKey.cpp" />
+    <ClCompile Include="storage\DictionaryLoader.cpp" />
+    <ClCompile Include="display\CandidateWindow.cpp" />
     <ClCompile Include="infra\Server.cpp" />
     <ClCompile Include="composition\StartComposition.cpp" />
     <ClCompile Include="infra\TextEditSink.cpp" />

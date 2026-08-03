@@ -57,6 +57,8 @@ extern USHORT ModifiersValue;
 extern BOOL IsShiftKeyDownOnly;
 extern BOOL IsControlKeyDownOnly;
 extern BOOL IsAltKeyDownOnly;
+extern UINT CandidateCommitKey; 
+extern BOOL isImeEnabled; //toggle 8/1/26
 
 extern const WCHAR FullWidthCharTable[];
 

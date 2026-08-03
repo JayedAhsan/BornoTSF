@@ -16,6 +16,8 @@
 #include "RegKey.h"
 #include "TfInputProcessorProfile.h"
 #include "CompositionProcessorEngine.h"
+#include "../storage/DictionaryLoader.h"
+#include "../display/CandidateWindow.h"
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -256,6 +258,14 @@ std::wstring CCompositionProcessorEngine::ApplyAllRules(const std::wstring &inpu
 
   return output;
 }
+// candidate
+std::wstring CCompositionProcessorEngine::ApplyRulesWithoutAutoCorrect(const std::wstring &input) {
+  BOOL oldCorr = Settings::GetPhoneticCorrection();
+  Settings::SetPhoneticCorrection(FALSE);
+  std::wstring output = ApplyAllRules(input);
+  Settings::SetPhoneticCorrection(oldCorr);
+  return output;
+}
 
 std::wstring CCompositionProcessorEngine::StringToWstring(const std::string &str, UINT codePage) {
   if (str.empty()) return std::wstring();
@@ -483,12 +493,17 @@ void CCompositionProcessorEngine::InitKeyStrokeTable() {
       {'M', 0},           {'M', TF_MOD_SHIFT},
       {VK_OEM_COMMA, 0},  {VK_OEM_COMMA, TF_MOD_SHIFT},
       {VK_OEM_PERIOD, 0}, {VK_OEM_PERIOD, TF_MOD_SHIFT},
-      {VK_OEM_2, 0},      {VK_OEM_2, TF_MOD_SHIFT}
+      {VK_OEM_2, 0},      {VK_OEM_2, TF_MOD_SHIFT}, // added num keys
+      {VK_NUMPAD0, 0},    {VK_NUMPAD1, 0},    {VK_NUMPAD2, 0},
+      {VK_NUMPAD3, 0},    {VK_NUMPAD4, 0},    {VK_NUMPAD5, 0},
+      {VK_NUMPAD6, 0},    {VK_NUMPAD7, 0},    {VK_NUMPAD8, 0},
+      {VK_NUMPAD9, 0},    {VK_DECIMAL, 0},    {VK_MULTIPLY, 0},
+      {VK_ADD, 0},        {VK_SUBTRACT, 0},   {VK_DIVIDE, 0}
   };
 
   const int keyCount = sizeof(keys) / sizeof(keys[0]);
 
-  for (int i = 0; i < keyCount; i++) {
+  for (int i = 0; i < keyCount && i < (int)(sizeof(_keystrokeTable) / sizeof(_keystrokeTable[0])); i++) {
     _keystrokeTable[i].VirtualKey = keys[i].vkey;
     _keystrokeTable[i].Modifiers = keys[i].modifier;
     _keystrokeTable[i].Function = FUNCTION_INPUT;
@@ -609,7 +624,7 @@ BOOL CCompositionProcessorEngine::IsVirtualKeyKeystrokeComposition(
 void CCompositionProcessorEngine::SetupKeystroke() {
   _KeystrokeComposition.Clear();
 
-  for (int i = 0; i < 100; i++) {
+  for (size_t i = 0; i < sizeof(_keystrokeTable) / sizeof(_keystrokeTable[0]); i++) { //fixed out of bounds err
     if (_keystrokeTable[i].VirtualKey != 0) {
       _KEYSTROKE *pKeystroke = _KeystrokeComposition.Append();
       if (pKeystroke) {
@@ -620,15 +635,21 @@ void CCompositionProcessorEngine::SetupKeystroke() {
 }
 
 void CCompositionProcessorEngine::SetupPreserved(_In_ ITfThreadMgr *pThreadMgr, TfClientId tfClientId) {
-  TF_PRESERVEDKEY tfPreservedKey;
-  tfPreservedKey.uVKey = VK_SPACE;
-  tfPreservedKey.uModifiers = TF_MOD_CONTROL;
+  if (pThreadMgr == nullptr) return;
 
-  SetPreservedKey(Global::BornoTSFGuidImeModePreserveKey, tfPreservedKey, Global::ImeModeDescription, &_PreservedKey_IMEMode);
-  InitPreservedKey(&_PreservedKey_IMEMode, pThreadMgr, tfClientId);
+  ITfKeystrokeMgr* pKeystrokeMgr = nullptr;
+  if (SUCCEEDED(pThreadMgr->QueryInterface(IID_ITfKeystrokeMgr, (void**)&pKeystrokeMgr)) && pKeystrokeMgr)
+  {
+      TF_PRESERVEDKEY pk;
+      pk.uVKey = VK_SPACE;
+      pk.uModifiers = TF_MOD_CONTROL;
+      pKeystrokeMgr->PreserveKey(tfClientId, Global::BornoTSFGuidImeModePreserveKey, &pk, L"Borno IME Mode Toggle", (ULONG)wcslen(L"Borno IME Mode Toggle"));
+      pKeystrokeMgr->Release();
+  }
 }
 
-void CCompositionProcessorEngine::SetupConfiguration() {
+void CCompositionProcessorEngine::SetupConfiguration() { // load the ac.json
+  CDictionaryLoader::GetInstance().LoadDictionary();
 }
 
 void CCompositionProcessorEngine::SetupLanguageBar(
