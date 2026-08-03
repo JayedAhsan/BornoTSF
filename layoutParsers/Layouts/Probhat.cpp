@@ -1,12 +1,26 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "Probhat.h"
+#include "../Common.h"
+#include "../../core/Settings.h"
+#include "../../core/Define.h"
 
 Probhat::Probhat() {
 }
 
 const std::vector<std::pair<boost::wregex, std::wstring>>& Probhat::GetRules() const {
-    static const std::vector<std::pair<boost::wregex, std::wstring>> probhat_rules = {
+    static DWORD lastState = 0xFFFFFFFF;
+    static std::vector<std::pair<boost::wregex, std::wstring>> cached_rules;
+
+    DWORD currentState = Settings::GetTypingStyle();
+    if (!cached_rules.empty() && lastState == currentState) {
+        return cached_rules;
+    }
+
+    lastState = currentState;
+    bool isTraditional = (currentState == TYPING_STYLE_TRADITIONAL);
+
+    cached_rules = {
         {boost::wregex(L"\""), L"”"},
         {boost::wregex(L"~"), L"“"},
         {boost::wregex(L"\\$"), L"৳"},
@@ -82,33 +96,52 @@ const std::vector<std::pair<boost::wregex, std::wstring>>& Probhat::GetRules() c
         {boost::wregex(L"([ক-হড়ঢ়য়])\\|"), L"র্$1"},
         {boost::wregex(L"\\|"), L"র্"},
         {boost::wregex(L"A"), L"অ"},
-        {boost::wregex(L"\\[([ক-হড়ঢ়য়])a"), L"$1ো"},
-
         {boost::wregex(L"f"), L"ত"},
-
-        {boost::wregex(L"\\[([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])"), L"$1ে"},
-        {boost::wregex(L"\\[([ক-হড়ঢ়য়])"), L"$1ে"},
-        {boost::wregex(L"\\{([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])"), L"$1ৈ"},
-        {boost::wregex(L"\\{([ক-হড়ঢ়য়])"), L"$1ৈ"},
-        {boost::wregex(L"i([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])"), L"$1ি"},
-        {boost::wregex(L"i([ক-হড়ঢ়য়])"), L"$1ি"},
-        {boost::wregex(L"a"), L"া"},
-        {boost::wregex(L"s"), L"স"},
-        {boost::wregex(L"S"), L"ষ"},
-        {boost::wregex(L"d"), L"ঢ"},
-        {boost::wregex(L"D"), L"ী"},
-        {boost::wregex(L"x"), L"শ"},
-        {boost::wregex(L"X"), L"ঢ়"},
-
-        {boost::wregex(L"\\]"), L"ো"},
-        {boost::wregex(L"\\}"), L"ৌ"},
-        {boost::wregex(L"c"), L"চ"},
-        {boost::wregex(L"C"), L"ছ"},
-        {boost::wregex(L"\\["), L"$1"},
-        {boost::wregex(L"\\{"), L"$1"},
-        {boost::wregex(L"i"), L"$1"},
-        {boost::wregex(L"([ািীুূৃেৈোৌ])্র"), L"্র$1"},
-        {boost::wregex(L"([ািীুূৃেৈোৌ])্য"), L"্য$1"},
     };
-    return probhat_rules;
+
+    if (isTraditional) {
+ 
+        cached_rules.push_back({boost::wregex(L"\\[([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])a"), L"$1ো"});
+        cached_rules.push_back({boost::wregex(L"\\[([ক-হড়ঢ়য়])a"), L"$1ো"});
+        cached_rules.push_back({boost::wregex(L"\\[([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])\\}"), L"$1ৌ"});
+        cached_rules.push_back({boost::wregex(L"\\[([ক-হড়ঢ়য়])\\}"), L"$1ৌ"});
+        cached_rules.push_back({boost::wregex(L"\\[([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])"), L"$1ে"});
+        cached_rules.push_back({boost::wregex(L"\\[([ক-হড়ঢ়য়])"), L"$1ে"});
+        cached_rules.push_back({boost::wregex(L"\\{([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])"), L"$1ৈ"});
+        cached_rules.push_back({boost::wregex(L"\\{([ক-হড়ঢ়য়])"), L"$1ৈ"});
+        cached_rules.push_back({boost::wregex(L"i([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])"), L"$1ি"});
+        cached_rules.push_back({boost::wregex(L"i([ক-হড়ঢ়য়])"), L"$1ি"});
+    } else {
+        
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])\\[a"), L"$1ো"});
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়])\\[a"), L"$1ো"});
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])\\[\\}"), L"$1ৌ"});
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়])\\[\\}"), L"$1ৌ"});
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])\\["), L"$1ে"});
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়])\\["), L"$1ে"});
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])\\{"), L"$1ৈ"});
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়])\\{"), L"$1ৈ"});
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়]্[ক-হড়ঢ়য়])i"), L"$1ি"});
+        cached_rules.push_back({boost::wregex(L"([ক-হড়ঢ়য়])i"), L"$1ি"});
+    }
+
+    cached_rules.push_back({boost::wregex(L"a"), L"া"});
+    cached_rules.push_back({boost::wregex(L"s"), L"স"});
+    cached_rules.push_back({boost::wregex(L"S"), L"ষ"});
+    cached_rules.push_back({boost::wregex(L"d"), L"ঢ"});
+    cached_rules.push_back({boost::wregex(L"D"), L"ী"});
+    cached_rules.push_back({boost::wregex(L"x"), L"শ"});
+    cached_rules.push_back({boost::wregex(L"X"), L"ঢ়"});
+
+    cached_rules.push_back({boost::wregex(L"\\]"), L"ো"});
+    cached_rules.push_back({boost::wregex(L"\\}"), L"ৌ"});
+    cached_rules.push_back({boost::wregex(L"c"), L"চ"});
+    cached_rules.push_back({boost::wregex(L"C"), L"ছ"});
+    cached_rules.push_back({boost::wregex(L"\\["), L"ে"});
+    cached_rules.push_back({boost::wregex(L"\\{"), L"ৈ"});
+    cached_rules.push_back({boost::wregex(L"i"), L"ি"});
+    cached_rules.push_back({boost::wregex(L"([ািীুূৃেৈোৌ])্র"), L"্র$1"});
+    cached_rules.push_back({boost::wregex(L"([ািীুূৃেৈোৌ])্য"), L"্য$1"});
+
+    return cached_rules;
 }
