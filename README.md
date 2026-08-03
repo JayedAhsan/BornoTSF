@@ -75,24 +75,15 @@
    * `Release | x86` (produces 32-bit `Release\BornoTSF.dll`)
 
 3. **Register the DLLs:**
-   Copy the compiled DLLs to system directories and register using `regsvr32` from an elevated Administrator Command Prompt:
+   Run `reg_bornoTSF.bat` as Administrator to copy required layout/dictionary assets and register the compiled DLLs:
    ```cmd
-   :: Copy 64-bit DLL to System32 and register (for 64-bit applications)
-   copy /y x64\Release\BornoTSF.dll %windir%\System32\BornoTSF.dll
-   regsvr32 %windir%\System32\BornoTSF.dll
-
-   :: Copy 32-bit DLL to SysWOW64 and register (for 32-bit applications on 64-bit Windows)
-   copy /y Release\BornoTSF.dll %windir%\SysWOW64\BornoTSF.dll
-   %windir%\SysWOW64\regsvr32 %windir%\SysWOW64\BornoTSF.dll
+   reg_bornoTSF.bat
    ```
 
-### Developer Tools
-
-* **Updating Khipro MIM Layout Specification (`tools/update_khipro.py`):**
-  If you modify the Khipro layout specification file (`layoutParsers/khipro-port/bn-khipro.mim`), convert it into the embedded byte array in `layoutParsers/Transliterators/Khipro.cpp` using:
-  ```bash
-  python tools/update_khipro.py [path/to/bn-khipro.mim]
-  ```
+   To unregister and remove installed files, run:
+   ```cmd
+   unreg_bornoTSF.bat
+   ```
 
 ---
 
@@ -106,7 +97,7 @@ BornoTSF is licensed under the **GNU General Public License v3.0 (GPL-3.0)**. Fr
 
 Special thanks to the Bangla computing community and developers whose work paved the way:
 
-* **Avro Team & Dr. Mehdi Hasan Khan & [Muhammad Mominul Huque](https://github.com/mominul)** — For the Avro phonetic parser implementation.
+* **Avro Team & Dr. Mehdi Hasan Khan & Muhammad Mominul Huque** — For the Avro phonetic parser implementation.
 * **Khipro Team** — For creating *Khipro*, the pioneer compositional layout for Bangla.
 * **Omi Azad** — For key contributions to Ekushey and Bangla open-source development.
 * **Borno Community** — For continuous feedback and layout recommendations.
