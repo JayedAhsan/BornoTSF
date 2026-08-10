@@ -66,9 +66,22 @@ BOOL BornoTSF::_IsKeyEaten(_In_ ITfContext *pContext, UINT codeIn, _Out_ UINT *p
         return FALSE;
     }
 
-    // Ctrl fix
-    if ((GetKeyState(VK_CONTROL) & 0x8000) || (GetKeyState(VK_LCONTROL) & 0x8000) || (GetKeyState(VK_RCONTROL) & 0x8000))
+    const BOOL isCtrlDown = (GetKeyState(VK_CONTROL) & 0x8000) ||
+                            (GetKeyState(VK_LCONTROL) & 0x8000) ||
+                            (GetKeyState(VK_RCONTROL) & 0x8000);
+
+    // Ctrl+Backspace deletes the active composition as one word. Outside a
+    // composition it is left to the application, along with other Ctrl keys.
+    if (isCtrlDown)
     {
+        if (isOpen && codeIn == VK_BACK && _IsComposing() && pKeyState)
+        {
+            *pCodeOut = VK_BACK;
+            pKeyState->Category = CATEGORY_COMPOSING;
+            pKeyState->Function = FUNCTION_CANCEL;
+            return TRUE;
+        }
+
         return FALSE;
     }
 
